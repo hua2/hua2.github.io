@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="花花, 刘永花, 博客, liuyonghua, html"><meta name="keywords" content="花花, 刘永花, 博客, liuyonghua, html"><link rel="stylesheet" type="text/css" href="//fonts.loli.net/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.5"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.5"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitalk/dist/gitalk.css?v=2.0.5"><title> CSS动画		 | 时光不老</title><meta name="generator" content="Hexo 4.2.1"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden"> CSS动画		</h1><a id="logo" href="/.">时光不老</a><p class="description">花花</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title"> CSS动画		</h1><div class="post-meta"><a href="/2018/05/08/css%E5%8A%A8%E7%94%BB/#comments" class="comment-count"></a><p><span class="date">May 08, 2018</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><p>CSS动画的两大组成部分：transition和animation。 <strong>CSS Transition</strong></p>
+<pre><code>img{
+    transition: 1s 1s height ease;
+}
+
+img{
+    transition-property: height;
+    transition-duration: 1s;
+    transition-delay: 1s;
+    transition-timing-function（变化速度）: ease;
+}
+（1）linear：匀速；（2）ease-in：加速；（3）ease-out：减速；（4）cubic-bezier函数：自定义速度模式</code></pre><p><strong>CSS Animation</strong> 我们还需要用keyframes关键字，定义rainbow效果。我们还需要用keyframes关键字，定义rainbow效果。</p>
+<pre><code>@keyframes rainbow {
+  0% { background: #c00; }
+  50% { background: orange; }
+  100% { background: yellowgreen; }
+}</code></pre><p>0%可以用from代表，100%可以用to代表，因此上面的代码等同于下面的形式。</p>
+<pre><code>@keyframes rainbow {
+  from { background: #c00 }
+  50% { background: orange }
+  to { background: yellowgreen }
+}</code></pre><p>另外一点需要注意的是，浏览器从一个状态向另一个状态过渡，是平滑过渡。steps函数可以实现分步过渡。</p>
+<pre><code>div:hover {
+  animation: 1s rainbow infinite steps(10);
+}</code></pre><p><code>animation-play-state:</code>如果想让动画保持突然终止时的状态，就要使用animation-play-state属性。</p>
+<pre><code>div {
+    animation: spin 1s linear infinite;
+    animation-play-state: paused;
+}
+
+div:hover {
+  animation-play-state: running;
+}
+
+animation的各种属性值简写：
+div:hover {
+  animation: 1s 1s rainbow linear 3 forwards normal;
+}
+可以分解成各个单独的属性。
+ div:hover {
+  animation-name: rainbow;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-delay: 1s;
+  animation-fill-mode:forwards;
+  animation-direction: normal;
+  animation-iteration-count: 3 (infinite，可以让动画无限次播放);
+}
+animation-fill-mode还可以使用下列值。
+（1）none：默认值，回到动画没开始时的状态;（2）backwards：让动画回到第一帧的状态;
+（3）both: 根据animation-direction（见后）轮流应用forwards和backwards规则animation-fill-mode还可以使用下列值。</code></pre><p><strong>浏览器前缀</strong> 目前，IE 10和Firefox（&gt;= 16）支持没有前缀的animation，而chrome不支持，所以必须使用webkit前缀。实际运用中，代码必须写成下面的样子。</p>
+<pre><code>div:hover {
+  -webkit-animation: 1s rainbow;
+  animation: 1s rainbow;  
+}
+
+@-webkit-keyframes rainbow {
+  0% { background: #c00; }
+  50% { background: orange; }
+  100% { background: yellowgreen; }
+}
+
+@keyframes rainbow {
+  0% { background: #c00; }
+  50% { background: orange; }
+  100% { background: yellowgreen; }
+}</code></pre></div><div class="post-copyright"><blockquote><p>原文作者: 花花</p><p>原文链接: <a href="http://liuyonghua.cn/2018/05/08/css动画/">http://liuyonghua.cn/2018/05/08/css动画/</a></p><p>版权声明: 转载请注明出处</p></blockquote></div><div class="tags"><a href="/tags/%E5%85%B6%E4%BB%96/">其他</a></div><div class="post-share"><div class="social-share"><span>分享到:</span></div></div><div class="post-nav"><a href="/2018/05/25/%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD/" class="pre"> 图片轮播		</a><a href="/2018/05/08/%E5%AE%9A%E4%BD%8Dposition/" class="next"> Position的属性值		</a></div><div id="comments"><div id="container"><script type="text/javascript" src="https://unpkg.com/gitalk/dist/gitalk.min.js?v=2.0.5"></script><script type="text/javascript" src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js?v=2.0.5"></script><script>var gitalk = new Gitalk({
+  clientID: '9ccd2e702ebf3c0c74be',
+  clientSecret: '056a8ffd2ca6188bf4bb0e441bc766e156325942',
+  repo: 'hua2.github.io',
+  owner: 'hua2',
+  admin: ['hua2'],
+  id: md5(window.location.pathname),
+  distractionFreeMode: false,
+  language: 'zh-CN',
+  pagerDirection: 'last'
+})
+gitalk.render('container')</script></div></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/10/10/%E5%B8%B8%E7%94%A8%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/"> 常用正则表达式		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/04/vue%E4%B8%AD%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E5%8F%8Atoken%E9%AA%8C%E8%AF%81/"> Vue中实现用户登录及token验证		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/%E4%BD%BF%E7%94%A8antd%E7%BC%96%E5%86%99-%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/"> 使用antd编写 修改密码		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/05/27/%E5%90%AF%E5%8A%A8api-mocker/"> API Mocker		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/05/24/app%E4%B8%8B%E8%BD%BD%E9%A1%B5%E9%9D%A2/"> App下载页面		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/04/30/20171222111552963/"> 20171222111552963		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/20/html%E4%B8%AD%E7%9A%84%E9%94%9A%E7%82%B9%E4%BD%BF%E7%94%A8/"> html中的锚点使用		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/20/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7/"> 浏览器兼容性		</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/03/Hexo-Client%E4%BD%BF%E7%94%A8%E6%B5%8B%E8%AF%95/">Hexo Client使用测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/24/git-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/"> Git 基本命令		</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-gui"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Other/">Other</a><span class="category-list-count">1</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/Blog/" style="font-size: 15px;">Blog</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/Client/" style="font-size: 15px;">Client</a> <a href="/tags/Test/" style="font-size: 15px;">Test</a> <a href="/tags/HUAHUA/" style="font-size: 15px;">HUAHUA</a> <a href="/tags/%E5%85%B6%E4%BB%96/" style="font-size: 15px;">其他</a> <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 15px;">博客</a> <a href="/tags/%E8%8A%B1%E8%8A%B1/" style="font-size: 15px;">花花</a> <a href="/tags/HELLO/" style="font-size: 15px;">HELLO</a> <a href="/tags/WORLD/" style="font-size: 15px;">WORLD</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">15</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-you"> 友情链接</i></div><ul></ul><a href="http://www.javayuan.xyz/" title="大明哥-李明元的博客" target="_blank">大明哥-李明元的博客</a></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">网站地图</a> |  <a href="/atom.xml">订阅本站</a> |  <a href="/about/">联系博主</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次，本站总访客数:<i id="busuanzi_container_site_uv"><i id="busuanzi_value_site_uv"></i></i>人</p><p><span> Copyright &copy;<a href="/." rel="nofollow">花花.</a></span><span> <a rel="nofollow" target="_blank" href="http://beian.miit.gov.cn/"> 鲁ICP备16023117号-2</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/" target="_blank" rel="noopener"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.5"></script><div id="fullscreen-img" class="hide"><span class="close"></span></div><script type="text/javascript" src="/js/imgview.js?v=2.0.5" async></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.5" async></script><link rel="stylesheet" type="text/css" href="/share/css/share.css"><script type="text/javascript" src="/share/js/social-share.js" charset="utf-8"></script><script type="text/javascript" src="/share/js/qrcode.js" charset="utf-8"></script><script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(n){n.imageLazyLoadSetting.processImages=o;var i=n.imageLazyLoadSetting.isSPA,r=Array.prototype.slice.call(document.querySelectorAll("img[data-original]"));function o(){i&&(r=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")));for(var t,e,a=0;a<r.length;a++)t=r[a],e=void 0,0<=(e=t.getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(n.innerHeight||document.documentElement.clientHeight)&&function(){var t,e,n,i,o=r[a];t=o,e=function(){r=r.filter(function(t){return o!==t})},n=new Image,i=t.getAttribute("data-original"),n.onload=function(){t.src=i,e&&e()},n.src=i}()}o(),n.addEventListener("scroll",function(){var t,e;t=o,e=n,clearTimeout(t.tId),t.tId=setTimeout(function(){t.call(e)},500)})}(this);</script></body></html>
