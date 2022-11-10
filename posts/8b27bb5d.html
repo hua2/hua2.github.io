@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="zh-CN" id="theme-mode-light"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="刘永花"><title>Vue中实现用户登录及token验证 · 花花的博客</title><meta name="description" content="Vue中实现token验证大致如下：1、第一次登录的时候，前端调后端的登陆接口，发送用户名和密码2、后端收到请求，验证用户名和密码，验证成功，就给前端返回一个token3、前端拿到token，将token存储到localStorage和vuex中，并跳转路由页面（本项目根据是否记住密码来判断toke"><meta name="keywords" content="花花,刘永花的博客,刘永花,博客,blog,Hexo,HTML,CSS,android,Linux"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.ico" type="image/x-icon"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><meta name="generator" content="Hexo 5.4.2"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><img src="https://avatars.githubusercontent.com/u/49386867?v=4" style="width:127px;border-radius:50%"><h3 title=""><a href="/">花花的博客</a></h3><div class="description"><p id="yiyan">...</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="http://github.com/hua2"><i class="fa fa-github"></i></a></li></ul><div class="footer"><a target="_blank" href="/"><span>Theme by </span></a><a target="_blank" rel="noopener" href="https://www.caicai.me"> CaiCai </a><span>&</span><a target="_blank" rel="noopener" href="https://github.com/Ben02/hexo-theme-Anatole"> Ben</a><div class="by_farbox"><a href="https://hexo.io/zh-cn/" target="_blank">Proudly published with Hexo&#65281;</a></div><div class="by_farbox"><span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"> </span><span>次</span></span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><li><a href="/about">关于</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle()"> </a></li></div><div class="avatar"><img src="/images/favicon.png"></div></div></div><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Vue中实现用户登录及token验证</a></h3></div><div class="post-content"><p><strong>Vue中实现token验证大致如下：</strong><br>1、第一次登录的时候，前端调后端的登陆接口，发送用户名和密码<br>2、后端收到请求，验证用户名和密码，验证成功，就给前端返回一个token<br>3、前端拿到token，将token存储到localStorage和vuex中，并跳转路由页面（本项目根据是否记住密码来判断token存储到sessionStorage或 localStorage ）<br>4、前端每次跳转路由，就判断 localStroage 中有无 token ，没有就跳转到登录页面，有则跳转到对应路由页面<br>5、每次调后端接口，都要在请求头中加token<br>6、后端判断请求头中有无token，有token，就拿到token并验证token，验证成功就返回数据，验证失败（例如：token过期）就返回401，请求头中没有token也返回401<br>7、如果前端拿到状态码为401，就清除token信息并跳转到登录页面  </p>
+<h3 id="login-vue"><a href="#login-vue" class="headerlink" title="login.vue"></a><strong>login.vue</strong></h3><p>调登录接口成功，在回调函数中将token存储到localStorage、sessionStorage和vuex中</p>
+<pre><code> methods: &#123;
+            handleSubmit(e) &#123;
+                e.preventDefault();
+                this.form.validateFields((err, values) =&gt; &#123;
+                    if (!err) &#123;
+                        this.$api.user.login(values
+                        ).then(res =&gt; &#123;
+                            if (res.data.id_token) &#123;
+                                this.$store.commit(&#39;login&#39;,&#123;token:res.data.id_token,rememberMe:values.rememberMe&#125;);
+                                this.$store.dispatch(&#39;initAccount&#39;);
+                                this.$router.push(&#39;/home&#39;);
+                            &#125;
+                        &#125;).catch(()=&gt;&#123;
+                            this.$message.error(&#39;用户名或密码错误&#39;);
+                        &#125;)
+                    &#125;
+                &#125;);
+            &#125;,
+        &#125;
+</code></pre>
+<h3 id="store-js"><a href="#store-js" class="headerlink" title="store.js"></a>store.js</h3><p>登录成功以及退出登录的token处理</p>
+<pre><code>import Vuex from &#39;vuex&#39;;
+import Vue from &#39;vue&#39;;
+
+
+Vue.use(Vuex);
+export default new Vuex.Store(&#123;
+    state: &#123;
+        token: null,
+    &#125;,
+    mutations: &#123;
+        // 登录成功将, token保存在localStorage和sessionStorage中
+        login: (state, data) =&gt; &#123;
+            if (data.rememberMe) &#123;
+                localStorage.token = data.token;
+            &#125; else &#123;
+                sessionStorage.token = data.token;
+            &#125;
+            state.token = data.token;
+        &#125;,
+        // 退出登录将, token清空
+        logout: (state) =&gt; &#123;
+            localStorage.removeItem(&#39;token&#39;);
+            sessionStorage.removeItem(&#39;token&#39;);
+            state.token = null
+        &#125;,
+    &#125;
+&#125;)
+</code></pre>
+<h3 id="http-js"><a href="#http-js" class="headerlink" title="http.js"></a>http.js</h3><p>请求头部加token以及状态码处理</p>
+<pre><code>/**
+ * 请求拦截器
+ * 每次请求前，如果存在token则在请求头中携带token
+ */
+instance.interceptors.request.use(
+    config =&gt; &#123;
+        // 登录流程控制中，根据本地是否存在token判断用户的登录情况
+        // 但是即使token存在，也有可能token是过期的，所以在每次的请求头中携带token
+        // 后台根据携带的token判断用户的登录情况，并返回给我们对应的状态码
+        // 而后我们可以在响应拦截器中，根据状态码进行一些统一的操作。
+        if (store.state.token) &#123;  // 判断是否存在token，如果存在的话，则每个http header都加上token
+            config.headers.Authorization = &#39;Bearer &#39;+ `$&#123;store.state.token&#125;`;
+        &#125;
+        return config;
+    &#125;,
+    error =&gt; Promise.error(error));
+
+// 响应拦截器
+instance.interceptors.response.use(
+    // 请求成功
+    res =&gt; Promise.resolve(res),
+    // 请求失败
+    error =&gt; &#123;
+        const &#123; response &#125; = error;
+        if (response) &#123;
+            // 请求已发出，但是不在2xx的范围
+            errorHandle(response.status, response.data.message);
+            return Promise.reject(response);
+        &#125; else &#123;
+            // 处理断网的情况
+            // eg:请求超时或断网时，更新state的network状态
+            // network状态在app.vue中控制着一个全局的断网提示组件的显示隐藏
+            // 关于断网组件中的刷新重新获取数据，会在断网组件中说明
+        &#125;
+    &#125;);
+/**
+ * 请求失败后的错误统一处理
+ * @param &#123;Number&#125; status 请求失败的状态码
+ */
+const errorHandle = (status, other) =&gt; &#123;
+    // 状态码判断
+    switch (status) &#123;
+        // 401: 未登录状态，跳转登录页
+        case 401:
+            toLogin();
+            break;
+        // 404请求不存在
+        case 404:
+            message.error(&#39;请求的资源不存在&#39;,5);
+            break;
+        default:
+            console.log(other);
+    &#125;&#125;;
+</code></pre>
+</div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2022-11-10</span><i class="fa fa-comment-o"></i><a href="/posts/8b27bb5d.html#comments">评论</a><i class="fa fa-tag"></i><a class="tag" href="/tags/Vue/" title="Vue">Vue </a></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="javascript:;" onclick="javascript:join_favorite()"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/posts/18c04b99.html" title="使用antd编写 修改密码">下一篇</a></li></ul></div><a id="comments"></a><div id="gitalk_container" style="margin:0 30px;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"><script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script><script>var gitalk = new Gitalk({
+    title: "Vue中实现用户登录及token验证",
+    clientID: "9ccd2e702ebf3c0c74be",
+    clientSecret: "407f4bce01e24568445813f4ad16139e1f11467d",
+    repo: "hua2.github.io",
+    owner: "hua2",
+    admin: ["hua2"],
+    id: location.pathname.slice(0, 50),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+})
+gitalk.render("gitalk_container")</script></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/script.js"></script><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script></body></html>
